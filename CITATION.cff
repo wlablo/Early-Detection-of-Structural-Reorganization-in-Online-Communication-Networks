@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+title: "Higgs Communication Network Analysis"
+message: "If you use this repository, please cite the associated manuscript."
+authors:
+  - family-names: "Błocki"
+    given-names: "Władysław"
+    orcid: "https://orcid.org/0009-0000-0006-9479"
