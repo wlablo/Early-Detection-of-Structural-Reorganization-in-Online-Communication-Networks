@@ -1,59 +1,47 @@
-# Higgs Communication Network Analysis
+# Entropy Dynamics as an Early-Warning Signal for Structural Reorganization
 
-Code and project structure for reproducing the analyses from the manuscript:
+This is a **lightweight GitHub-ready repository package** prepared to stay below common browser upload limits.
 
-**Early Detection of Structural Reorganization in Online Communication Networks: A Multiplex Graph-State Approach**
+## What is included
 
-## Structure
+- blind-review manuscript PDF and LaTeX source in `docs/`
+- small sample datasets in `data/samples/`
+- dataset inventory in `metadata/`
+- helper script in `scripts/`
 
-- `src/` — reusable analysis functions
-- `run_analysis.py` — entry point for running the pipeline
-- `data/raw/` — raw input data (place `higgs-activity_time.txt` or `.gz` here)
-- `data/processed/` — processed outputs
-- `figures/` — generated and manuscript figures
-- `notebooks/` — optional exploratory notebooks
+## Why the full data are not included here
 
-## Expected input
+The original CSV files are too large for simple browser-based upload workflows that reject files above roughly 25 MB.
+For the full datasets, use one of these options:
 
-Place the Higgs activity file in `data/raw/`:
+1. **Git LFS** for large CSV files
+2. **GitHub Releases** and link them in the README
+3. **Zenodo / OSF / Figshare** for archival hosting, then link from the repository
 
-- `higgs-activity_time.txt`
-- or `higgs-activity_time.txt.gz`
+## Suggested public repository structure
 
-The script expects columns:
-
-`timestamp user_a user_b interaction_type`
-
-where interaction types can include `RT`, `MT`, and `RE`.
-
-## Installation
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Linux / macOS
-pip install -r requirements.txt
+```text
+.
+├── data/
+│   └── samples/
+│       ├── brexit/
+│       └── ira/
+├── docs/
+├── metadata/
+├── scripts/
+├── .gitignore
+├── README.md
+└── UPLOAD_FULL_DATA_OPTIONS.md
 ```
 
-## Run
+## Included samples
 
-```bash
-python run_analysis.py --input data/raw/higgs-activity_time.txt.gz --window-hours 1
-```
+- `data/samples/ira/IRAhandle_tweets_1.csv` — first 1000 rows
+- `data/samples/ira/IRAhandle_tweets_2.csv` — first 1000 rows
+- `data/samples/ira/IRAhandle_tweets_3.csv` — first 1000 rows
+- `data/samples/brexit/tcat_brexit_train_sample.csv` — first 1000 data rows
 
-## Outputs
+## Recommendation
 
-The pipeline computes per-window:
-
-- von Neumann entropy
-- quantum Jensen–Shannon divergence (QJSD)
-- fidelity
-- a simple curvature proxy derived from second differences in QJSD
-
-and writes:
-
-- processed CSV files to `data/processed/`
-- diagnostic plots to `figures/`
-
-## Notes
-
-This repository is a clean, reproducible project skeleton for the article workflow. Before public release, verify the exact preprocessing and parameter settings against the final manuscript.
+Upload this lightweight package to GitHub now.
+Keep the full raw datasets outside the main repository unless you use Git LFS or an external archival host.

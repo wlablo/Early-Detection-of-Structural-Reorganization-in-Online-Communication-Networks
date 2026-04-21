@@ -1,0 +1,586 @@
+\documentclass[sigconf]{acmart}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+\setcopyright{acmlicensed}
+\copyrightyear{2026}
+\acmYear{2026}
+\acmDOI{XXXXXXX.XXXXXXX}
+\acmConference[Hypertext '26]{ACM Conference on Hypertext and Social Media}{September 14--18, 2026}{London, UK}
+\acmISBN{978-1-4503-XXXX-X/2026/09}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{url}
+
+\graphicspath{{./images/}}
+
+\begin{document}
+
+\title[Entropy Dynamics for Early Warning]{Entropy Dynamics for Early Warning in Reuse-Based Proxy Networks:
+Monitoring Structural Reorganization in Partially Observable Networked Discourse}
+
+\author{Anonymous Author(s)}
+\affiliation{%
+  \institution{Anonymous Institution(s)}
+  \country{Anonymous}
+}
+\renewcommand{\shortauthors}{Anonymous Author(s)}
+
+\begin{abstract}
+This article develops an early-warning framework for detecting structural reorganization in observable communication behavior under constrained observability. Entropy Dynamics is defined as the time evolution of a graph-entropy signal derived from a normalized graph-state representation of rolling network windows, in which each window is mapped to a trace-normalized graph operator and summarized through von Neumann graph entropy. The framework asks which classes of factors can drive Entropy Dynamics and which of those factors remain measurable in near real time such that useful lead time can be obtained before operational milestones.
+
+The empirical component is a proof-of-concept analysis of the IRA Twitter corpus. Because the available files do not expose retweet source--target pairs, the empirical design uses rolling reuse-based proxy networks constructed from repeated message forms rather than direct diffusion graphs. Under strict quasi-live constraints, entropy-based alerts are compared with volume and Shannon-entropy baselines. The results show that, in this setting, Entropy Dynamics provides useful early warning for concentration shifts but not reliably for generic activity bursts. The contribution is therefore methodological and deliberately bounded: the article offers a prospective monitoring framework for reuse-based proxy networks and partially observable linked textual environments while avoiding stronger claims about latent intent detection, complete influence reconstruction, or universal superiority over simpler baselines.
+\end{abstract}
+
+\keywords{entropy dynamics, von Neumann graph entropy, early-warning detection, reuse-based proxy networks, structural reorganization, quasi-live monitoring, networked discourse, hypertext, social media interpretability}
+
+\maketitle
+
+\section{Introduction}
+
+Observable communication environments linked to coordinated or adversarial activity can shift rapidly in network structure, narrative attention, and participation. At a broad theoretical level, communication can be approached as a problem of signal, uncertainty, and observable structure, even if the present article addresses those issues through evolving network traces rather than through the narrow engineering model of transmission alone~\cite{shannon1949}. Yet much of the empirical literature remains retrospective: amplification pathways, community structure, and diffusion patterns are usually reconstructed only after the relevant traces have accumulated and stabilized~\cite{holme2012,ranshous2015}. This creates a methodological asymmetry. Researchers can often explain observable communication networks after the fact, but they are less well equipped to detect structural intensification or reorganization while those processes are still emerging.
+
+In settings such as platform integrity, crisis communication, and electoral information environments, that timing matters~\cite{GhoshRanu2023,SaezTrumper2014,Zannettou2017}. Methods optimized for stable snapshots are poorly suited to early intervention or prospective situational awareness. A central difficulty is uncertainty: networks observed during active communication episodes are incomplete, noisy, and volatile. Edges appear and disappear, actor roles shift, and measurement is shaped by missingness, deletions, and visibility constraints.
+
+In hypertext terms, platform-mediated communication can be treated as a partially visible linking environment in which repeated message forms create traceable, link-like structures across accounts and time~\cite{Carrino2024,LiadiGraus2023}. This makes reuse-based proxy networks analytically useful even when direct source--target diffusion links are unavailable. More broadly, such a framing contributes to the interpretation of large-scale linked textual environments under constrained observability~\cite{Carrino2024,LiadiGraus2023,AyoobiEtAl2024}.
+
+The present article adopts a simple premise: uncertainty can itself be informative. When observable communication behavior approaches a regime transition---for example, when attention tightens around fewer message forms, bridges activate between previously weakly connected groups, or concentration rises sharply---its structural dispersion may shift before the change becomes obvious in raw volume counts~\cite{YamakawaTajima2023}. Entropy Dynamics is introduced as a way to track those shifts. Among the available formulations, von Neumann graph entropy is especially useful because it links network structure to a normalized matrix representation analogous to a density operator. The value of that formalism is methodological rather than metaphysical: it provides a compact state representation for evolving graphs and a principled scalar summary of structural uncertainty~\cite{passerini2009,chen2019}.
+
+The article develops this idea as a communication-oriented early-warning framework. The aim is not to claim that influence operations are ``quantum'' in any literal sense, nor that entropy alone can reveal hidden intent. The narrower question is whether a normalized graph-state representation of evolving observable networks yields a practically useful monitoring signal under quasi-live conditions. The central claim is therefore deliberately modest: entropy-based monitoring is evaluated as a tool for anticipating observable structural reorganization---especially concentration shifts---rather than as a complete detector of coordinated communication behavior or latent intent.
+
+The empirical component is a proof-of-concept study of the IRA Twitter corpus. Because the available files used here do not provide the retweet source--target edges needed to reconstruct direct diffusion graphs, the design adopts a conservative operationalization: rolling account--content reuse networks derived from repeated message forms within time windows. This design does not reconstruct latent intent, nor does it claim to recover a complete influence topology. Instead, it tests whether structural reorganization in observable message reuse can produce entropy shifts that precede operational milestones under quasi-live constraints. This positioning aligns the article with recent work on coordinated behavior, influence operations, and constrained observability rather than with stronger claims about complete reconstruction of intent or diffusion topology~\cite{bail2020,pacheco2021,sharma2021,schoch2022,wang2023,tardelli2024,LiadiGraus2023,SaezTrumper2014,Zannettou2017}.
+
+The article makes four contributions. First, it formulates Entropy Dynamics as an early-warning concept for communication-network monitoring. Second, it develops a factor taxonomy that distinguishes structural, temporal, informational, measurement-related, and exogenous drivers of entropy change. Third, it specifies an integrated methods-and-evaluation protocol that prevents future leakage and prioritizes actionable lead time over retrospective fit. Fourth, it demonstrates, on a well-known dataset, how entropy-based alerts compare with volume and Shannon-entropy baselines under constrained observability.
+
+The empirical claim remains bounded. This article shows that, in a proof-of-concept analysis of reuse-based proxy networks under quasi-live constraints, Entropy Dynamics can provide useful early warning for concentration shifts, but not reliably for generic activity bursts. The results should therefore be read as evidence about structural reorganization in observable reuse patterns rather than as a definitive reconstruction of influence transmission or a general claim of external validity. Read in this way, the article also speaks to hypertext-centred approaches to social media by treating repeated message reuse as a partially observable linking structure within platformed discourse.
+
+The remainder of the article proceeds as follows. Section~\ref{sec:conceptual} outlines the conceptual logic of the state-based monitoring framework. Section~\ref{sec:questions} formulates the research questions and factor taxonomy. Section~\ref{sec:data} describes the data, case selection, and scope of inference. Section~\ref{sec:methods} presents the integrated methods and evaluation protocol. Section~\ref{sec:results} reports the empirical results, including robustness checks and a supplementary portability check. Section~\ref{sec:discussion} discusses interpretive limits, uncertainty, and external-validity requirements. Section~\ref{sec:dataavailability} presents code and data availability information. Section~\ref{sec:conclusion} concludes.
+
+\section{Conceptual Overview: State-Based Network Monitoring}
+\label{sec:conceptual}
+
+Early-warning monitoring requires a representation that can be computed on rolling time windows, remains interpretable under noisy and incomplete observations, and responds to structural reorganization rather than only to changes in activity volume. The framework adopted here treats each time window as a network state and summarizes its uncertainty through a graph-entropy signal. In this article, state-based language is methodological rather than metaphorical: it provides a compact way to represent evolving network structure and compare successive windows on a common basis.
+
+\subsection{From Windowed Observations to Network States}
+
+Observations arriving within a window are converted into a network representation for that window, and the resulting structure is mapped into a state-like object suitable for spectral analysis. In an ideal setting, the network would be built directly from retweet or amplification relations. In the proof-of-concept analysis used here, the available data do not expose complete source-target retweet edges, so the observable structure is operationalized through account--content coupling based on repeated message forms. The empirical proxy changes, but the conceptual pipeline remains the same: each window is converted into a comparable representation of how activity is organized at that moment.
+
+This representation is designed to foreground structural configuration rather than raw throughput alone. What matters is not simply how much activity occurs, but whether the arrangement of observable ties becomes more concentrated, more diffuse, or differently organized across windows. The use of a stabilized graph operator therefore supports temporal comparison even when the empirical network is noisy, incomplete, or derived from a proxy rather than from fully observed diffusion edges.
+
+\subsection{Why Entropy Can Function as an Early-Warning Signal}
+
+Observable structural reorganization does not necessarily become legible only when volume spikes~\cite{GhoshRanu2023}. Reorganization may begin earlier through redistribution of attention, tightening concentration around a smaller set of actors or message forms, or shifts in the balance between dispersed and coordinated behavior, including patterns in which communication becomes more strongly mediated through a narrower set of influential or intermediating actors~\cite{katz1955}. An entropy measure is attractive in this setting because it compresses such structural changes into a single trajectory that can be monitored over time. When the underlying network state becomes more ordered, more concentrated, or otherwise spectrally reconfigured, the entropy signal may change before the operational consequences become obvious in simpler indicators.
+
+Entropy Dynamics refers here to the time-evolution of that signal across successive windows. Sudden deviations, persistent drifts, or regime shifts in the entropy trajectory can therefore be treated as candidate early-warning signals. Importantly, the signal is not interpreted as direct evidence of intent. Instead, it is used as an indicator that the observable communication structure is being reorganized in a way that may precede externally visible milestones.
+
+\subsection{Relation between the Conceptual and Empirical Layers}
+
+The framework is broader than the particular dataset used in the demonstration. Conceptually, it is suited to rolling monitoring of evolving communication networks whenever successive windows can be represented in a comparable graph form. Empirically, the present case study is more constrained: because the available IRA files do not include complete retweet source--target information, the analysis focuses on repeated message-form reuse as the most defensible observable proxy for coordination. The results should therefore be read primarily as evidence about structural reorganization in reuse-based proxy networks rather than as a definitive reconstruction of influence topology.
+
+Section~\ref{sec:conceptual} functions only as a conceptual map. Formal definitions of the graph operator, state construction, entropy computation, alert generation, and evaluation are given in Section~\ref{sec:methods}.
+
+\section{Research Questions and Hypothesis Space}
+\label{sec:questions}
+
+\subsection{Research Questions}
+
+The article addresses the following research questions:
+
+\begin{enumerate}
+    \item \textbf{RQ1.} Which classes of factors can theoretically drive Entropy Dynamics in evolving observable communication networks under constrained observability?
+    \item \textbf{RQ2.} Which of these factors are measurable in near real time under quasi-live monitoring constraints?
+    \item \textbf{RQ3.} Can entropy-based alerts derived from rolling network states provide lead time before observable operational milestones in the IRA case study?
+    \item \textbf{RQ4.} Under constrained observability, does von Neumann entropy add information beyond simpler baselines such as message volume and Shannon entropy over message-form distributions?
+\end{enumerate}
+
+These questions are intentionally ordered from conceptual to empirical. The first two concern explanatory scope and observability. The latter two concern operational usefulness under realistic monitoring conditions.
+
+\subsection{Factor Taxonomy}
+
+Entropy Dynamics may be shaped by several classes of drivers:
+
+\begin{enumerate}
+    \item \textbf{Structural factors:} changes in degree concentration, edge density, clustering, bridge formation, modularity shifts, or centralization~\cite{YamakawaTajima2023}.
+    \item \textbf{Temporal factors:} burstiness, acceleration, synchronization, inter-event regularity, and lag compression across actors.
+    \item \textbf{Informational factors:} narrowing or diversification of content, hashtag reuse, URL reuse, message-template repetition, attention concentration, and shifts in issue salience or topical emphasis across windows~\cite{mccombs1972}.
+    \item \textbf{Measurement factors:} sampling windows, missingness, moderation events, API or archive constraints, deduplication rules, and preprocessing choices.
+    \item \textbf{Exogenous contextual factors:} breaking news, campaign deadlines, platform interventions, or offline political events that perturb communication structure.
+\end{enumerate}
+
+Not all of these are directly observable in near real time. The empirical design of the present article focuses on measurable structural and informational proxies derived from the available corpus, while treating intent and exogenous triggers as contextual interpretation rather than direct inputs to the warning model.
+
+\begin{table}[t]
+\caption{Factor taxonomy used to organize plausible drivers of Entropy Dynamics.}
+\label{tab:taxonomy}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{p{0.28\columnwidth} p{0.62\columnwidth}}
+\toprule
+\textbf{Driver Class} & \textbf{Illustrative Components} \\
+\midrule
+Structural drivers &
+Edge churn; bridge activation; inter-community permeability; centralization shifts. \\
+Temporal drivers &
+Burstiness; synchronization; recurrence; wave structure. \\
+Informational drivers &
+Topic convergence/divergence; novelty rate; attention concentration; topical emphasis shifts. \\
+Measurement drivers &
+Sampling variability; deletions; visibility shifts; API and observability constraints. \\
+Exogenous drivers &
+Breaking news; campaign deadlines; platform interventions; offline political events. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Data, Case Study, and Scope of Inference}
+\label{sec:data}
+
+The empirical demonstration uses the publicly known IRA Twitter corpus, which has become a canonical dataset for retrospective study of coordinated communication behavior and suspected influence activity. Its value for the present study lies not in perfect completeness, but in providing a historically important and sufficiently rich archive for testing whether entropy-based monitoring can identify structural changes before selected milestones become visible.
+
+The specific files available for the present analysis contain tweet-level information but do not expose full retweet source--target edge lists. This matters because many network analyses of coordinated or adversarial activity rely on directly reconstructed diffusion graphs. In the absence of such edges, a more conservative operationalization is required. The empirical networks in this article are therefore constructed from repeated message forms linking accounts to shared or repeated textual, URL, or hashtag patterns within rolling windows. This produces a reuse-based proxy network that can still reveal concentration and coordination-like recurrence without claiming a full reconstruction of retweet diffusion.
+
+Although this representation is not equivalent to a fully observed diffusion graph, it can be interpreted as a link-like textual structure that preserves observable associations among accounts, repeated forms, and temporal recurrence~\cite{Carrino2024,LiadiGraus2023}. In that sense, the empirical design captures a constrained but still meaningful layer of platformed hypertextual connectivity.
+
+Although this archive does not support full reconstruction of directional diffusion, it remains informative for the present research purpose because the article does not test a theory of complete cascade topology. Instead, it tests whether structural reorganization in message reuse can be detected prospectively under realistic visibility constraints. In that setting, repeated message forms are analytically meaningful because they capture concentration, recurrence, and cross-account coupling in the most directly observable layer of the archive. The dataset is therefore suitable not as a complete map of influence transmission, but as a constrained yet substantively relevant test bed for whether entropy-based monitoring can extract early-warning information from partial communication traces.
+
+The case is suitable for a proof of concept for three reasons. First, it involves known episodes of organized communication behavior. Second, the data are rich enough to support rolling-window analysis. Third, the constraints of the archive mirror real monitoring problems: incomplete observability, imperfect reconstruction, and the need to act on proxies rather than latent coordination itself.
+
+\subsection{Empirical Object and Inferential Boundary}
+
+The empirical object analyzed here should be stated precisely. The method is not applied to a fully observed communication graph, retweet diffusion graph, or influence network. It is applied to reuse-based proxy networks derived from repeated message forms. That distinction matters because the observable network available for analysis is itself a constructed representation of one layer of coordination-like behavior. Consequently, the article's empirical claims concern structural reorganization in observable reuse patterns, not a comprehensive account of how information propagated across the broader platform.
+
+This inferential boundary is not a minor caveat. It affects how the results should be read, how the contribution should be framed, and what kinds of external generalization remain premature. A strong claim about communication-network reorganization would require fuller edge observability than the present archive permits. The present study therefore advances a narrower but more defensible claim: under constrained observability, state-based entropy monitoring can extract potentially useful warning signals from reuse-based proxy networks of evolving structure.
+
+The analysis is framed as quasi-live rather than fully real-time. Windows are processed sequentially, and all detection decisions at time $t$ are based only on information available up to that point. This design prevents future leakage and aligns the empirical test with the intended monitoring use case.
+
+\section{Methods and Evaluation Protocol}
+\label{sec:methods}
+
+\begin{table}[t]
+\caption{Analytical workflow used in the quasi-live monitoring framework.}
+\label{tab:workflow}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{p{0.28\columnwidth} p{0.62\columnwidth}}
+\toprule
+\textbf{Stage} & \textbf{Operation} \\
+\midrule
+Input stream & Tweet-level observations with account identifiers, timestamps, and observable content fields. \\
+Preprocessing & Basic normalization of text, URL handling, and extraction of repeated message forms or related content signatures. \\
+Windowing & Rolling time windows using only observations available up to time $t$. \\
+Network construction & Account--content incidence matrices and projected account--account weighted graphs for each window. \\
+State representation & Construction of the trace-normalized Laplacian-derived operator $\rho_t$ for each window. \\
+Structural signal & Computation of von Neumann graph entropy $S_{\mathrm{vN}}(t)$ and first-difference Entropy Dynamics $\Delta S_t$. \\
+Alerting & Detection of anomalous entropy changes using quasi-live thresholding based on prior windows only. \\
+Evaluation & Comparison of alert timing against prospective operational milestones and against volume and Shannon-entropy baselines. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Windowing and Quasi-Live Constraints}
+
+Let the ordered stream of observed messages be partitioned into rolling time windows $W_t$, indexed by $t = 1, 2, \dots, T$. Each window contains all observations whose timestamps fall within a fixed-width interval of duration $\Delta$, with adjacent windows advanced by a step size $s$. The empirical analysis uses only information available up to the end of window $W_t$ when computing all statistics and thresholds for that window.
+
+Formally, if $\mathcal{D}_{\le t}$ denotes the subset of observations with timestamps not later than the end of $W_t$, then every transformation, baseline estimate, and alerting decision at time $t$ is a function of $\mathcal{D}_{\le t}$ only. No normalization, threshold, or milestone label is allowed to depend on future windows. This quasi-live constraint prevents information leakage and aligns the analysis with prospective monitoring rather than retrospective fitting.
+
+\subsection{Network Construction and Empirical Operationalization}
+
+For each window $W_t$, a graph $G_t = (V_t, E_t)$ is constructed from observable account--content relations. Because the available corpus does not include complete retweet source--target pairs, the network is operationalized as a bipartite or projected structure in which accounts are linked through repeated message forms, including repeated text templates, repeated URLs, repeated hashtags, or a combined content signature. Let $x_{i\alpha}(t)$ indicate whether account $i$ is associated with content feature $\alpha$ in window $t$. The account--content incidence matrix is then
+\begin{equation}
+B_t = [x_{i\alpha}(t)].
+\end{equation}
+
+An account--account weighted projection may be formed as
+\begin{equation}
+A_t = B_t B_t^{\top},
+\end{equation}
+with diagonal entries removed when self-links are excluded. In practice, edge weights reflect the number of shared message forms within the window. This projection is not interpreted as direct diffusion; it is an empirical proxy for coordinated reuse or concentration around common content forms.
+
+To stabilize spectral quantities, the weighted adjacency matrix is symmetrized if necessary and converted into an undirected representation used consistently across windows.
+
+\subsection{Graph Operator, State Construction, and von Neumann Entropy}
+
+Given the weighted adjacency matrix $A_t$, define the degree matrix $D_t$ by
+\begin{equation}
+D_t(i,i) = \sum_j A_t(i,j).
+\end{equation}
+
+The combinatorial Laplacian is
+\begin{equation}
+L_t = D_t - A_t.
+\end{equation}
+
+To ensure comparability across windows of different total weight, the analysis uses the trace-normalized Laplacian-derived operator
+\begin{equation}
+\rho_t = \frac{L_t}{\operatorname{Tr}(L_t)}
+\end{equation}
+whenever $\operatorname{Tr}(L_t) > 0$. This matrix is positive semidefinite and has unit trace, so it can be treated formally as a density matrix in the graph-theoretic sense. The use of $\rho_t$ is methodological: it provides a normalized state representation of window $t$ suitable for entropy computation and temporal comparison.
+
+Let $\lambda_1(t), \dots, \lambda_n(t)$ denote the eigenvalues of $\rho_t$. Because $\rho_t$ is positive semidefinite with unit trace, these eigenvalues satisfy $\lambda_k(t) \ge 0$ and $\sum_k \lambda_k(t) = 1$. The von Neumann graph entropy of window $t$ is then
+\begin{equation}
+S_{\mathrm{vN}}(t) = - \operatorname{Tr}(\rho_t \log \rho_t)
+= - \sum_{k=1}^{n} \lambda_k(t) \log \lambda_k(t),
+\end{equation}
+with the convention that $0 \log 0 = 0$.
+
+This entropy quantifies the spectral dispersion of the normalized graph state. Higher values indicate a more distributed or less concentrated spectrum, whereas lower values indicate stronger concentration in fewer dominant modes. The interpretation remains structural rather than intentional: the entropy is treated as a summary of observable organization in the windowed network.
+
+\subsection{Entropy Dynamics, Alerts, and Milestone Evaluation}
+
+Define the entropy time series
+\begin{equation}
+\mathcal{S} = \left\{S_{\mathrm{vN}}(1), S_{\mathrm{vN}}(2), \dots, S_{\mathrm{vN}}(T)\right\}.
+\end{equation}
+
+In the empirical implementation used here, Entropy Dynamics is operationalized through first differences,
+\begin{equation}
+\Delta S_t = S_{\mathrm{vN}}(t) - S_{\mathrm{vN}}(t-1),
+\end{equation}
+because the alerting figures and reported results are based on anomalies in the change signal rather than in the raw entropy level. Let $\mu_t^{(\Delta)}$ and $\sigma_t^{(\Delta)}$ denote the expanding baseline mean and standard deviation estimated from past $\Delta S$ values only. The standardized anomaly score is
+\begin{equation}
+Z_t^{(\Delta)} = \frac{\Delta S_t - \mu_t^{(\Delta)}}{\sigma_t^{(\Delta)}},
+\end{equation}
+for windows where $\sigma_t^{(\Delta)} > 0$.
+
+An alert is generated when $\lvert Z_t^{(\Delta)} \rvert$ exceeds a pre-specified threshold $\tau$. In the main specification, the alerting threshold is $\tau = 2.5$. The main specification uses an expanding baseline estimated from prior windows only, and no persistence or refractory rule is applied. All thresholds are calibrated only from information available up to time $t$ within the quasi-live framework.
+
+The empirical evaluation uses operational milestones that can be defined directly from observable window-level statistics. Two milestone families are emphasized:
+\begin{enumerate}
+    \item \textbf{Activity burst:} a window in which the total message count exceeds a high historical percentile or a z-score threshold relative to prior windows.
+    \item \textbf{Concentration shift:} a window in which content reuse or actor concentration rises sharply, for example through an increase in Herfindahl concentration, dominance of top accounts, or sharp narrowing of repeated message forms.
+\end{enumerate}
+
+These milestones are treated as operational evaluation targets rather than independent ground truth for latent intent. They are not used as inputs to the entropy computation itself.
+
+In the main specification, concentration-shift milestones are defined prospectively from the Herfindahl concentration of repeated message forms within each window. Let
+\begin{equation}
+C_t = \sum_{\alpha} p_{\alpha}(t)^2,
+\end{equation}
+where $p_{\alpha}(t)$ denotes the empirical share of repeated message form $\alpha$ in window $t$. A concentration-shift milestone is registered when $C_t$ exceeds the expanding 95th percentile of its prior values, computed using windows available up to time $t$ only. Detection is evaluated using a fixed look-back horizon of $L = 72$ hours.
+
+This construction reduces circularity while preserving substantive relevance. The milestone is defined on empirical concentration in the observable reuse distribution, whereas the entropy-based alert is defined on anomalous change in the spectral dispersion of the projected graph state. The evaluation thus compares a spectral warning signal against a distinct operational target derived prospectively from reuse concentration, rather than against a relabeled copy of the alerting statistic itself.
+
+In the main evaluation configuration, the milestone definition, threshold rule, and look-back horizon are fixed in advance and applied uniformly across methods. A milestone is considered detected if at least one alert occurs within a fixed predeclared look-back horizon before the milestone window. Lead time is measured as the elapsed time between the most recent qualifying prior alert and the milestone onset. Performance is summarized using recall, false alarms per day, and median lead time.
+
+\subsection{Baselines and Comparative Evaluation}
+
+Two baseline signals are used for comparison.
+
+First, a volume baseline monitors the total number of observed messages per window:
+\begin{equation}
+V_t = |W_t|.
+\end{equation}
+
+Second, a Shannon-entropy baseline monitors the diversity of repeated message forms within the window. If $p_{\alpha}(t)$ is the empirical share of content feature $\alpha$ in window $t$, then
+\begin{equation}
+H_t = - \sum_{\alpha} p_{\alpha}(t) \log p_{\alpha}(t).
+\end{equation}
+
+Each baseline is converted into alerts under the same quasi-live thresholding logic used for the entropy signal. Comparative evaluation focuses on recall, false alarms per day, and median lead time. This makes it possible to assess whether von Neumann entropy adds practical early-warning value beyond changes in volume or simple content diversity.
+
+\subsection{Uncertainty, Validation Scope, and What Is Not Estimated Here}
+
+The article evaluates operational usefulness rather than estimating a causal effect of entropy on communication outcomes. Accordingly, the reported performance metrics should be read as descriptive monitoring summaries within a quasi-live framework, not as precise population estimates or as formal evidence of universal out-of-sample superiority. The present version does not claim bootstrap confidence intervals, permutation-based null benchmarks, or cross-corpus generalization tests that were not explicitly executed in the reported workflow.
+
+This clarification matters for interpretation. The results can show that one monitoring signal appears more useful than another in the present dataset and specification, but they cannot by themselves establish broad transportability across platforms, languages, or observability regimes. For that reason, the article treats uncertainty explicitly as part of the scope of inference rather than attempting to overstate conclusiveness.
+
+A stronger next stage of validation would add bootstrap intervals for lead-time summaries, null-model or permutation checks for alert timing, rolling-origin validation across held-out temporal blocks, and cross-corpus comparison of alert calibration. These additions would help distinguish stable signal from dataset-specific tuning and would strengthen the evidentiary basis for any broader comparative claim.
+
+\section{Results}
+\label{sec:results}
+
+Results are reported for a proof-of-concept analysis of the IRA Twitter corpus for the period 2017-10-01 to 2017-10-31. Because the available files do not expose retweet source--target pairs, windowed structure is operationalized as a reuse-based proxy network based on repeated message forms. Accounts are linked to repeated forms after URL removal and basic text normalization, enabling monitoring of coordinated amplification through shared content. The reported findings should therefore be interpreted primarily as evidence about structural reorganization in reuse-based proxy networks under quasi-live constraints rather than as a full reconstruction of directional influence.
+
+The primary empirical claim of the article concerns concentration shifts rather than activity bursts. Accordingly, the main specification is evaluated first and foremost in terms of whether entropy-based alerts anticipate observable increases in concentration of message reuse. Activity-burst results are retained as a secondary and more limited comparison, especially because the strict quasi-live 6-hour specification yields no burst milestones and the shorter-window robustness configurations contain only very sparse burst evidence.
+
+\subsection{Window-Level Statistics}
+
+The main quasi-live simulation uses a window length of 6~hours with a step size of 1~hour. Entropy is computed for 346 evaluated windows. Across those windows, the median number of active accounts is 6, the median number of repeated message forms is 10, and the median number of events per window is 168. The projected account--account structures are sparse in most windows, but concentration varies substantially over time. That heterogeneity matters substantively because the early-warning framework is designed to detect precisely such shifts in observable organization.
+
+The sharp decline in event counts after approximately 20~October in Figure~\ref{fig:events} should not be interpreted as a substantive collapse of campaign activity. Rather, it reflects the effective exhaustion of the informative repeated-content subset under the filtering criteria used for the main quasi-live run, after which only a very small number of qualifying observations remain available for windowed analysis. Figure~\ref{fig:entropy} plots the raw von Neumann entropy trajectory across rolling windows.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{fig1_entropy.png}
+    \caption{Von Neumann graph entropy $S(\rho_t)$ with detected alerts (crosses).}
+    \Description{Time series plot of von Neumann graph entropy across rolling windows, with selected windows marked by alert symbols.}
+    \label{fig:entropy}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{fig2_deltaS.png}
+    \caption{Entropy Dynamics $\Delta S_t$ with detected alerts (crosses).}
+    \Description{Time series plot of the first-difference entropy signal across rolling windows, with anomaly alerts marked by crosses.}
+    \label{fig:deltaS}
+\end{figure}
+
+\subsection{Entropy Trajectories and Detected Alerts}
+
+The von Neumann entropy series does not move monotonically with message volume. In the main specification, $S(\rho_t)$ has a mean of 1.564 and a standard deviation of 0.506, while the alerting threshold $\tau = 2.5$ yields 9 entropy alerts. Several of those alerts cluster around intervals in which repeated message reuse becomes more concentrated, which suggests that entropy is responding to structural redistribution rather than simply to throughput. Some of the clearest entropy deviations occur before the most visible increases in raw event counts, indicating that reorganization in the reuse-based proxy network structure can precede obvious volume escalation. The alerting logic is applied to the first-difference signal shown in Figure~\ref{fig:deltaS}.
+
+The result should nevertheless be read proportionately. The article does not show that entropy is the most sensitive detector in every sense, nor that it dominates simpler methods across all milestone classes. What the main specification suggests is narrower: in this case study, under this quasi-live setup, the entropy signal appears especially useful when the substantive target is concentration-related reorganization rather than throughput alone.
+
+\subsection{Operational Milestones and Lead Time}
+
+Two milestone types are used as the main operational targets for lead-time evaluation: activity bursts and concentration shifts. Under the strict quasi-live implementation used in the main specification, all milestone statistics are computed prospectively from information available up to each evaluation time only. An important consequence is that, in the 6-hour main configuration, no activity-burst milestones are observed once the expanding baseline is enforced. The main quantitative comparison therefore centers on concentration shifts, while activity bursts are interpreted through shorter-window robustness configurations in which such milestones do appear.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{fig3_events.png}
+    \caption{Window event counts in the 6-hour main configuration for the filtered repeated-content stream. Under the expanding-baseline quasi-live specification, no activity-burst milestones are observed in this run.}
+    \Description{Time series of window event counts in the main six-hour configuration, showing variation across time and no burst milestones under the expanding-baseline rule.}
+    \label{fig:events}
+\end{figure}
+
+\subsection{Baseline Comparison}
+
+For concentration shifts in the strict quasi-live main configuration (window length = 6~h, step size = 1~h, all posts, basic normalization), von Neumann entropy achieves recall 0.958, a false-alarm rate of 0.163 per day, and a median lead time of 50~hours. The Shannon-entropy baseline achieves slightly higher recall at 1.000, but it does so with 33 alerts rather than 9, a substantially higher false-alarm rate of 0.293 per day, and a much shorter median lead time of 12~hours. The volume baseline produces no valid concentration-shift detections in this formulation. Substantively, the comparison suggests that the entropy signal is not the most sensitive detector in an absolute sense; rather, in the main configuration it is the most useful longer-horizon structural warning signal among the methods examined here.
+
+\begin{table}[t]
+\caption{Main quasi-live comparison for concentration shifts (window length = 6~h, step size = 1~h, all posts, basic normalization).}
+\label{tab:maincomparison}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Method} & \textbf{Alerts} & \textbf{Milestones} & \textbf{Recall} & \textbf{FAR/day} & \textbf{Median lead time (h)} \\
+\midrule
+Von Neumann entropy      & 9  & 24 & 0.958 & 0.163 & 50 \\
+Shannon entropy baseline & 33 & 24 & 1.000 & 0.293 & 12 \\
+Volume baseline          & 0  & 24 & 0     & 0     & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interpretation of Entropy Regimes}
+
+The entropy trajectory is best read heuristically as a summary of how dispersed or concentrated the reuse-based proxy network structure is within each window. High-entropy windows correspond to relatively diffuse and heterogeneous reuse patterns. Lower-entropy windows are associated with tighter concentration around fewer repeated forms or more regularized account--content coupling. These regimes should not be overinterpreted as evidence of intent or authorship. Their value lies in distinguishing distributed phases from phases of structural compression in a way that can be monitored sequentially.
+
+\subsection{Additional Milestones: Exploratory Extension}
+
+Two additional milestone types are examined as exploratory extensions: community spillover and semantic change points. These tests are included to probe the broader scope of the framework rather than to serve as the primary basis of method comparison. Because the number of such milestones is small, these results should be interpreted as descriptive rather than confirmatory.
+
+For spillover milestones ($n = 5$), von Neumann entropy alerts precede 1 milestone, with median lead time 35.0~hours. For semantic-change milestones ($n = 4$), von Neumann entropy alerts precede 2 milestones, with median lead time 27.0~hours. Figure~\ref{fig:spillover} illustrates the relationship between spillover milestones and entropy alerts, while Figure~\ref{fig:semantic} shows the semantic-change indicator together with the timing of entropy alerts.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{fig4_spillover.png}
+    \caption{Community spillover ($spill_t$) with spillover milestones (circles) and entropy alerts (crosses).}
+    \Description{Time series of a spillover indicator with circles marking spillover milestones and crosses marking entropy alerts.}
+    \label{fig:spillover}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{fig5_semantic.png}
+    \caption{Semantic change indicator ($JS_t$) with semantic milestones (circles) and entropy alerts (crosses).}
+    \Description{Time series of a semantic change indicator with circles marking semantic milestones and crosses marking entropy alerts.}
+    \label{fig:semantic}
+\end{figure}
+
+\begin{table}[t]
+\caption{Lead-time summary for spillover and semantic milestones.}
+\label{tab:exploratory}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{p{0.22\columnwidth} p{0.18\columnwidth} c c c}
+\toprule
+\textbf{Milestone type} & \textbf{Method} & \textbf{Mean lead time (h)} & \textbf{Median (h)} & \textbf{Missing} \\
+\midrule
+Community spillover   & Von Neumann entropy & 35.0  & 35.0 & 4 \\
+Community spillover   & Shannon baseline    & 15.2  & 13.0 & 0 \\
+Community spillover   & Volume baseline     & 41.6  & 45.0 & 0 \\
+Semantic change point & Von Neumann entropy & 27.0  & 27.0 & 2 \\
+Semantic change point & Shannon baseline    & 70.0  & 24.0 & 0 \\
+Semantic change point & Volume baseline     & 108.5 & 63.5 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across the main quasi-live specification, the strongest and most decision-relevant evidence supports entropy-based anticipation of concentration shifts rather than generic bursts. The exploratory milestone analyses are therefore best read as suggestive scope checks, not as independent confirmation of broad superiority across multiple types of structural change.
+
+\subsection{Robustness and Supplementary Validation}
+
+Additional robustness analyses assess the stability of the entropy signal across window length, alert thresholds, subset selection, and text-normalization choices. These checks are exploratory sensitivity analyses rather than confirmatory tests of a pre-registered secondary specification. Their purpose is to assess boundary conditions, not to replace the main specification or overturn the bounded claim of the main comparison.
+
+The strongest von Neumann configurations outside the main 6-hour specification converge on shorter windows under a subset of robustness parameterizations. Across the robustness analysis, the best-performing settings in the informative subsets use a window length of 3~hours, a step size of 1~hour, and basic text normalization. The 6-hour specification nevertheless remains the primary configuration for a methodological reason rather than a purely numerical one: it was adopted as the main quasi-live operating frame before comparative robustness screening and corresponds to a more conservative monitoring cadence for the proof-of-concept analysis.
+
+Accordingly, the shorter 3-hour windows are interpreted as sensitivity evidence showing that the signal can become more responsive under finer temporal granularity, not as grounds for replacing the main specification \textit{ex post} with the numerically strongest-performing variant. The article therefore prioritizes design discipline over retrospective optimization: the main specification is the one fixed in advance for the principal evaluation, while the shorter-window configurations are used to characterize boundary conditions and responsiveness trade-offs.
+
+Step-size sensitivity shows a clear trade-off between granularity and alert density. Reducing the step size to 0.5~hour improves the false-alarm trade-off for concentration shifts (recall 0.973, FAR/day 0.033), but median lead time declines to 33.75~hours. With a 1-hour step, median lead time increases to 50~hours at the cost of a higher false-alarm rate. Threshold sensitivity analyses are directionally consistent with the main specification and do not materially alter the substantive interpretation of the results.
+
+The retweets-only subset remains too sparse to function as a stable validation set in the present archive, producing zero von Neumann alerts across the tested combinations. By contrast, the originals-only subset remains informative and produces patterns close to the all-posts configuration. Overall, the robustness analyses support a bounded rather than absolute claim: Entropy Dynamics remains a viable early-warning signal under multiple reasonable parameterizations, especially for concentration shifts, but its advantage depends on milestone type, window design, and the chosen alerting rule. Interpretation of the activity-burst rows in Table~\ref{tab:bestconfigs} should remain highly tentative, because the informative robustness configuration contains only a single milestone.
+
+\begin{table}[t]
+\caption{Best-performing von Neumann configurations by milestone class and subset.}
+\label{tab:bestconfigs}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{p{0.16\columnwidth} p{0.15\columnwidth} p{0.10\columnwidth} c c c c c c c}
+\toprule
+\textbf{Milestone} & \textbf{Subset} & \textbf{Variant} & \textbf{Win.} & \textbf{Step} & \textbf{Alerts} & \textbf{Miles.} & \textbf{Recall} & \textbf{FAR/day} & \textbf{Lead} \\
+\midrule
+Activity burst      & All posts      & basic & 3 & 1 & 8 & 1  & 1.000 & 0.260 & 78 \\
+Activity burst      & Originals only & basic & 3 & 1 & 8 & 1  & 1.000 & 0.260 & 78 \\
+Concentration shift & All posts      & basic & 3 & 1 & 8 & 19 & 0.947 & 0.032 & 28 \\
+Concentration shift & Originals only & basic & 3 & 1 & 8 & 21 & 0.905 & 0.065 & 33 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Supplementary Portability Check on a Brexit-Related Corpus}
+
+As a supplementary portability check, the monitoring pipeline was also applied to a small Brexit-related Twitter corpus containing 1,071 tweets collected between 28 and 30 March 2017. The corpus includes timestamps, user identifiers, tweet text, and basic interaction metadata, which makes it sufficient for reconstructing the rolling account--content representation used in the main analysis. To preserve comparability with the IRA-based main specification, the same quasi-live configuration was retained: a 6-hour rolling window, a 1-hour step size, basic text normalization, an expanding baseline for anomaly scoring, no persistence or refractory rule, and an entropy-alert threshold of $\tau = 2.5$ applied to standardized anomalies in $\Delta S_t$.
+
+In the supplementary corpus, 35 windows yielded non-degenerate graph states suitable for entropy evaluation. Across those evaluated windows, the median number of active accounts was 22, the median number of repeated message forms was 21, and the median number of repeated-content events per window was 44. The von Neumann entropy series had a mean of 1.536 and a standard deviation of 1.393. Under the main alerting rule, the entropy signal generated 2 alerts.
+
+For concentration-shift evaluation, the milestone definition followed the same prospective logic used in the main framework. Specifically, the concentration statistic was defined as the Herfindahl concentration of repeated message forms within each window, and a concentration-shift milestone was registered when that statistic exceeded the expanding 95th percentile of prior windows only. Detection was evaluated using a fixed look-back horizon of 48 hours. Under this definition, the Brexit corpus produced 1 concentration-shift milestone, and the entropy-based pipeline detected that milestone with a lead time of 10 hours.
+
+\begin{table}[t]
+\caption{Supplementary portability check on the Brexit-related corpus.}
+\label{tab:brexit_portability}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{l c}
+\toprule
+\textbf{Quantity} & \textbf{Value} \\
+\midrule
+Tweets & 1,071 \\
+Time span & 2017-03-28 to 2017-03-30 \\
+Window length (h) & 6 \\
+Step size (h) & 1 \\
+Evaluated windows & 35 \\
+Median active accounts & 22 \\
+Median repeated message forms & 21 \\
+Median repeated-content events per window & 44 \\
+Mean von Neumann entropy & 1.536 \\
+SD of von Neumann entropy & 1.393 \\
+Entropy alerts & 2 \\
+Concentration-shift milestones & 1 \\
+Detected milestones & 1 \\
+Recall & 1.000 \\
+Median lead time (h) & 10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{brexit_portability_plot.png}
+    \caption{Supplementary portability check on the Brexit-related corpus. Top panel: von Neumann entropy trajectory with detected alerts. Bottom panel: concentration statistic $C_t$ (Herfindahl concentration of repeated message forms), its expanding 95th-percentile threshold, and the detected concentration-shift milestone.}
+    \Description{Two-panel figure for the Brexit-related supplementary corpus. The top panel shows the entropy trajectory with two alerts. The bottom panel shows the concentration statistic, its expanding threshold, and one concentration-shift milestone.}
+    \label{fig:brexit_portability}
+\end{figure}
+
+These results should be interpreted cautiously. Because the supplementary corpus is short and yields only a single concentration-shift milestone in the main 6-hour configuration, it does not constitute a full external validation set comparable in evidentiary weight to the IRA-based analysis. Its role is narrower: it shows that the same rolling account--content entropy workflow can be transferred to a substantively different communication stream and can still generate prospectively timed structural alerts. The supplementary evidence therefore supports portability of the pipeline rather than strong claims of generalization performance.
+
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\subsection{Implications of the Empirical Findings}
+
+The findings support the view that Entropy Dynamics can function as an informative structural warning signal under constrained observability. Its strongest performance appears in relation to concentration shifts rather than generic activity bursts, which is consistent with the theoretical logic motivating the method.
+
+\subsection{What the Framework Does Not Claim}
+
+No entropy measure, however sophisticated, can by itself infer hidden intent or distinguish organic from inauthentic coordination with certainty. Structural reorganization is best understood as a warning signal, not as evidence of latent intent in itself. In the present study, it is more accurate to speak of observable structural concentration and reorganization in a reuse-based proxy network than of direct detection of latent intent or full communication-network change.
+
+\subsection{Measurement Confounds in Streaming Settings}
+
+Any real monitoring pipeline faces confounds stemming from deletions, moderation, missingness, language variation, and platform-specific visibility constraints. These factors can alter apparent network structure independently of underlying communication dynamics.
+
+\subsection{Threats to Validity and Failure Conditions}
+
+The main validity threat in the present study is the proxy-based reconstruction of windowed structure from repeated message forms rather than direct diffusion edges. A related issue concerns the milestones themselves: concentration shifts and activity bursts are operational evaluation targets, not external ground truth for latent intent. For concentration shifts specifically, the milestone relies on distinct operational indicators of concentration, whereas the alert relies on a spectral anomaly in $\Delta S_t$; the two are therefore related but not identical transformations of the same observable stream.
+
+The framework should also be falsifiable in substantive terms. It should not be expected to outperform simpler baselines when change is driven mainly by abrupt throughput spikes without prior structural redistribution, when windows are too sparse for stable spectral estimation, or when observability constraints erase most meaningful relational information. Read in this way, the present results define both the promise and the limits of the approach.
+
+\subsection{External Validity and Replication Needs}
+
+The present study is a proof of concept centered on one main corpus plus a lightweight supplementary portability check. That is sufficient to motivate the framework, but not to settle its broader validity. Stronger claims would require replication across multiple datasets, platforms, languages, and observability regimes. In particular, future work should test the method on corpora with fully observed source--target diffusion edges, because that would allow direct comparison between reuse-based proxy networks and richer communication-network reconstructions.
+
+\subsection{Uncertainty Quantification and Validation Priorities}
+
+A stronger next version of this research program should add formal uncertainty quantification. Examples include bootstrap intervals for lead-time summaries, permutation or phase-randomization tests for anomaly baselines, rolling-origin validation across held-out temporal blocks, and cross-corpus comparison of alert calibration. These additions would help distinguish stable signal from dataset-specific tuning and would improve the interpretability of performance differences between entropy-based and simpler baselines.
+
+\subsection{What Entropy Adds beyond Simpler Monitoring Signals}
+
+The distinctive value of the present framework lies in using a spectral entropy defined on a normalized graph state. This matters because the object of interest in the article is not only how much activity occurs, nor only how diverse observable content appears to be, but whether the relational organization of the communication structure is being reconfigured across windows. Von Neumann graph entropy is useful in that setting because it summarizes the dispersion of the eigenvalue spectrum of the trace-normalized graph operator rather than only the marginal frequency distribution of events or message forms~\cite{braunstein2006,passerini2009,dedomenico2016}.
+
+That distinction is substantively important. Measures such as message volume are sensitive to throughput, but they are largely indifferent to whether the same volume is organized in a diffuse or a compressed relational pattern. Likewise, Shannon entropy over message-form frequencies captures diversity in observable content distributions, but it does not directly encode how accounts become coupled through shared reuse patterns. A spectral entropy can register that difference because it depends on the global organization of the graph state rather than on marginal counts alone.
+
+In the present application, that property is especially relevant because the task is to detect prospective structural reorganization under constrained observability. The clearest empirical gain appears not in generic activity bursts, where simple throughput measures may suffice, but in concentration shifts, where relational compression matters more than raw volume alone. From a hypertext perspective, this also matters because the framework treats repeated message reuse as a partially observable linking structure rather than as a mere frequency distribution~\cite{Carrino2024,LiadiGraus2023}. The contribution is therefore also interpretive: it offers a way to monitor structural change in large-scale networked discourse while preserving a clear distinction between observable relational organization and stronger claims about hidden intent~\cite{Carrino2024,LiadiGraus2023,GhoshRanu2023,AyoobiEtAl2024}.
+
+\section{Code and Data Availability}
+\label{sec:dataavailability}
+
+Code, processed data, figure files, and workflow materials have been prepared for release in an anonymized replication package. To preserve blind review, repository details are omitted from the submitted version. The full package, including processed October 2017 datasets derived from the IRA tweet corpus, summary tables, manuscript figures, repository documentation, and starter scripts for reconstructing the rolling entropy workflow used in the analyses, will be provided upon acceptance.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This article proposes Entropy Dynamics as an early-warning framework for monitoring structural reorganization in reuse-based proxy networks under quasi-live constraints. By representing each rolling time window as a normalized graph state and tracking the resulting von Neumann entropy, the framework shifts attention from retrospective network reconstruction toward prospective detection of structural transition.
+
+The proof-of-concept analysis of the IRA Twitter corpus shows that, in this setting, Entropy Dynamics can provide useful early warning for concentration shifts, but not reliably for generic activity bursts. The method is therefore best understood as a structural warning signal for redistribution and compression in observable reuse patterns, not as a universal detector of all forms of escalation.
+
+The broader implication is methodological. Communication research on coordinated and adversarial online behavior benefits from tools that treat uncertainty and reorganization as measurable dynamics rather than only as obstacles to retrospective explanation, especially where strategic information operations unfold through distributed and participatory forms of collaboration rather than through fully legible centralized control~\cite{starbird2019}. Entropy-based monitoring is one such tool, provided that its outputs are interpreted cautiously, evaluated prospectively, and kept separate from stronger claims about latent intent.
+
+At the same time, the present evidence remains limited. Future research should therefore test the framework on datasets with fully observed diffusion edges, multilingual message streams, and platform settings in which bridge formation and cross-community spillover can be reconstructed directly. The central question is not whether state-based language is intrinsically necessary, but whether normalized state representations and entropy trajectories improve the timeliness and interpretability of network monitoring in practice.
+
+\appendix
+
+\section{Preprocessing and Empirical Operationalization}
+\label{app:preprocessing}
+
+Messages are normalized within each window through basic text standardization, URL handling, and construction of repeated-content signatures. Depending on the robustness variant, these signatures may be based on repeated URLs, repeated hashtags, repeated text templates, or a combined content form.
+
+Accounts with no qualifying repeated-content relation in a given window may be excluded from the projected graph for that window, and self-links are removed after projection. Sparse windows are retained for descriptive continuity but may be excluded from entropy-based alerting when the graph operator becomes degenerate.
+
+For concentration-shift evaluation in the main specification, milestones are defined prospectively from the Herfindahl concentration of repeated message forms, using an expanding 95th-percentile threshold computed from prior windows only and a fixed look-back horizon of 72 hours. The milestone and the alert are therefore derived from the same observable stream but remain analytically non-identical: the former is based on empirical reuse concentration, whereas the latter is based on anomalous change in the spectral dispersion of the projected graph state.
+
+\section{Full Robustness Tables}
+\label{app:robustness}
+
+Detailed robustness tables report alert counts, milestone recall, false alarms per day, and lead times across parameter combinations. These tables are intended to show the operational trade-offs associated with alternative window widths, step sizes, and content-signature definitions.
+
+\begin{table}[h]
+\caption{Sensitivity to step size in the quasi-live specification.}
+\label{tab:step-sensitivity}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{l c c c c c c}
+\toprule
+\textbf{Milestone Type} & \textbf{Step Size (h)} & \textbf{Alerts} & \textbf{Milestones} & \textbf{Recall} & \textbf{FAR/day} & \textbf{Median lead time (h)} \\
+\midrule
+Concentration shift & 0.5 & 10 & 37 & 0.973 & 0.033 & 33.75 \\
+Concentration shift & 1.0 & 9  & 24 & 0.958 & 0.163 & 50 \\
+Activity burst      & 0.5 & 10 & 0  & --    & 0.033 & -- \\
+Activity burst      & 1.0 & 9  & 0  & --    & 0.163 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

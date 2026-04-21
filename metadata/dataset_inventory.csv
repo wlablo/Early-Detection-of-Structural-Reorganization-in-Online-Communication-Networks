@@ -1,0 +1,9 @@
+file_group,file_name,rows_including_header,delimiter,notes
+ira_full,IRAhandle_tweets_1.csv,381017,comma,original full file not included in lightweight package
+ira_full,IRAhandle_tweets_2.csv,397233,comma,original full file not included in lightweight package
+ira_full,IRAhandle_tweets_3.csv,368886,comma,original full file not included in lightweight package
+brexit_full,tcat_brexit_train.csv,1072,semicolon,original full file not included in lightweight package
+ira_sample,IRAhandle_tweets_1.csv,1001,comma,included sample
+ira_sample,IRAhandle_tweets_2.csv,1001,comma,included sample
+ira_sample,IRAhandle_tweets_3.csv,1001,comma,included sample
+brexit_sample,tcat_brexit_train_sample.csv,1001,semicolon,included sample
